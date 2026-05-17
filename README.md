@@ -1,36 +1,60 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CatFeederLog
+
+猫の給餌を家族・同居人と共有管理する Web アプリ。
+
+「誰かがもうあげた？」という二重給餌を防ぐことを最重要ユースケースとする。
+餌場に QR コードを貼り、スキャン → 1 タップで給餌記録が完了する設計。
+
+## Features
+
+- **クイック記録** — QR スキャン → ボタン 1 タップで給餌ログを保存
+- **リアルタイム共有** — 同一世帯のメンバー全員が即時に記録を確認できる
+- **当日の給餌状況** — ホーム画面で本日の記録を時系列表示
+- **Google ログイン** — 初回のみ認証、以降はセッション維持（PWA 対応予定）
+- **セルフホスト対応** — 誰でも自分の猫用にデプロイして使える
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+
+- [Supabase](https://supabase.com) プロジェクト（無料枠で動作）
+
+### 1. Clone & Install
+
+```bash
+git clone https://github.com/KotaWatanabe0909/CatFeederLog.git
+cd CatFeederLog
+npm install
+```
+
+### 2. 環境変数の設定
+
+`.env.local.example` をコピーして値を入力する。
+
+```bash
+cp .env.local.example .env.local
+```
+
+| 変数名 | 取得元 |
+|--------|--------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase ダッシュボード > Settings > API |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | 同上 |
+| `SUPABASE_SERVICE_ROLE_KEY` | 同上（Service Role） |
+
+### 3. 起動
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`http://localhost:3000` を開く。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Self-hosting
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+個人・家族データはすべて自分の Supabase プロジェクトに保存される。
+このリポジトリはコードのみを含み、猫の名前・フード情報・メンバー構成等の個人データは一切含まない。
 
-## Learn More
+## License
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT
