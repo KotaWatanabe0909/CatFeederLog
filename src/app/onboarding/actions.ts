@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { randomUUID } from "crypto";
 
 export async function createHousehold(formData: FormData) {
   const supabase = await createClient();
@@ -12,23 +13,23 @@ export async function createHousehold(formData: FormData) {
   const catName = formData.get("catName") as string;
   const displayName = formData.get("displayName") as string;
 
-  const { data: household, error: householdError } = await supabase
-    .from("households")
-    .insert({ name: householdName })
-    .select()
-    .single();
+  const householdId = randomUUID();
 
-  if (householdError || !household) throw new Error("世帯の作成に失敗しました");
+  const { error: householdError } = await supabase
+    .from("households")
+    .insert({ id: householdId, name: householdName });
+
+  if (householdError) throw new Error("世帯の作成に失敗しました");
 
   const { error: memberError } = await supabase
     .from("members")
-    .insert({ household_id: household.id, user_id: user.id, display_name: displayName, role: "owner" });
+    .insert({ household_id: householdId, user_id: user.id, display_name: displayName, role: "owner" });
 
   if (memberError) throw new Error("メンバーの作成に失敗しました");
 
   const { error: catError } = await supabase
     .from("cats")
-    .insert({ household_id: household.id, name: catName });
+    .insert({ household_id: householdId, name: catName });
 
   if (catError) throw new Error("猫の登録に失敗しました");
 
