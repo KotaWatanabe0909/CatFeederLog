@@ -26,11 +26,28 @@ export async function middleware(request: NextRequest) {
   );
 
   const { data: { user } } = await supabase.auth.getUser();
+  const pathname = request.nextUrl.pathname;
 
-  if (!user && !request.nextUrl.pathname.startsWith("/login")) {
+  // 未ログイン → /login へ
+  if (!user && !pathname.startsWith("/login") && !pathname.startsWith("/auth")) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
+  }
+
+  // ログイン済みで世帯未所属 → /onboarding へ
+  if (user && !pathname.startsWith("/onboarding") && !pathname.startsWith("/auth")) {
+    const { data: member } = await supabase
+      .from("members")
+      .select("id")
+      .eq("user_id", user.id)
+      .single();
+
+    if (!member) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/onboarding";
+      return NextResponse.redirect(url);
+    }
   }
 
   return supabaseResponse;
