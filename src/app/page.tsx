@@ -2,8 +2,6 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { PushSubscriber } from "@/components/PushSubscriber";
-import { CatLottie } from "@/components/CatLottie";
 import { getActiveMembership } from "@/lib/active-household";
 
 function getElapsedLabel(fedAt: string): string {
@@ -54,7 +52,6 @@ export default async function CatListPage() {
 
   return (
     <main className="flex min-h-screen flex-col items-center bg-zinc-50 px-4 pb-24 pt-8">
-      <PushSubscriber />
       <div className="w-full max-w-md">
         <div className="mb-2 flex items-center justify-between">
           <h1 className="text-xl font-bold">愛猫一覧</h1>
@@ -62,8 +59,6 @@ export default async function CatListPage() {
             設定
           </Link>
         </div>
-
-        <CatLottie className="mx-auto mb-2 h-40 w-40" />
 
         <ul className="flex flex-col gap-3">
           {(cats ?? []).map((cat) => {

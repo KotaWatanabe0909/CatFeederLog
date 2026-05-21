@@ -40,30 +40,9 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // ログイン済みでグループ未所属 → /onboarding へ（/invite/* は通す: ページ内で参加処理）
-  if (
-    user &&
-    !pathname.startsWith("/onboarding") &&
-    !pathname.startsWith("/auth") &&
-    !pathname.startsWith("/invite")
-  ) {
-    const { data: member } = await supabase
-      .from("members")
-      .select("id")
-      .eq("user_id", user.id)
-      .limit(1)
-      .maybeSingle();
-
-    if (!member) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/onboarding";
-      return NextResponse.redirect(url);
-    }
-  }
-
   return supabaseResponse;
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.svg).*)"],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|sw.js|.*\\.svg).*)"],
 };
