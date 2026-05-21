@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { PushSubscriber } from "@/components/PushSubscriber";
 
 type FeedingLog = {
   id: string;
@@ -12,7 +13,13 @@ type FeedingLog = {
 };
 
 const FOOD_LABEL: Record<string, string> = { dry: "ドライ", wet: "ウェット" };
-const AMOUNT_LABEL: Record<string, string> = { finished: "完食", leftover: "残した" };
+const AMOUNT_LABEL: Record<string, string> = {
+  all: "完食",
+  most: "ほぼ完食",
+  half: "半分",
+  little: "少し残した",
+  none: "ほとんど食べず",
+};
 
 export default async function HomePage() {
   const supabase = await createClient();
@@ -41,6 +48,7 @@ export default async function HomePage() {
 
   return (
     <main className="flex min-h-screen flex-col items-center bg-zinc-50 px-4 py-8">
+      <PushSubscriber />
       <div className="w-full max-w-md">
         <div className="mb-6 flex items-center justify-between">
           <h1 className="text-xl font-bold">今日の給餌</h1>
@@ -61,23 +69,28 @@ export default async function HomePage() {
         ) : (
           <ul className="flex flex-col gap-3">
             {(logs as unknown as FeedingLog[]).map((log) => (
-              <li key={log.id} className="rounded-xl bg-white p-4 shadow-sm">
-                <div className="flex items-center justify-between">
-                  <span className="font-medium">
-                    {FOOD_LABEL[log.food_type] ?? log.food_type}
-                    {log.amount && ` · ${AMOUNT_LABEL[log.amount] ?? log.amount}`}
-                  </span>
-                  <span className="text-sm text-gray-400">
-                    {new Date(log.fed_at).toLocaleTimeString("ja-JP", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      timeZone: "Asia/Tokyo",
-                    })}
-                  </span>
-                </div>
-                <p className="mt-1 text-sm text-gray-500">
-                  {log.members?.display_name}
-                </p>
+              <li key={log.id}>
+                <Link
+                  href={`/record/${log.id}/edit`}
+                  className="block rounded-xl bg-white p-4 shadow-sm active:bg-gray-50"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">
+                      {FOOD_LABEL[log.food_type] ?? log.food_type}
+                      {log.amount && ` · ${AMOUNT_LABEL[log.amount] ?? log.amount}`}
+                    </span>
+                    <span className="text-sm text-gray-400">
+                      {new Date(log.fed_at).toLocaleTimeString("ja-JP", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        timeZone: "Asia/Tokyo",
+                      })}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-sm text-gray-500">
+                    {log.members?.display_name}
+                  </p>
+                </Link>
               </li>
             ))}
           </ul>

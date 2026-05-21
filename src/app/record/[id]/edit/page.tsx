@@ -1,10 +1,16 @@
 import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
+import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
-import { logFeeding } from "./actions";
+import { updateFeeding } from "./actions";
 
-export default async function RecordPage() {
+export default async function EditFeedingPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
   const supabase = await createClient();
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -15,26 +21,19 @@ export default async function RecordPage() {
     .select("id, household_id")
     .eq("user_id", user.id)
     .single();
-
   if (!member) redirect("/onboarding");
 
-  const { data: lastLog } = await supabase
+  const { data: log } = await supabase
     .from("feeding_logs")
-    .select("food_type")
-    .eq("household_id", member.household_id)
-    .order("fed_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  const defaultFoodType = lastLog?.food_type ?? "dry";
-
-  const { data: cat } = await supabase
-    .from("cats")
-    .select("id, name")
+    .select("id, food_type, amount, member_id")
+    .eq("id", id)
     .eq("household_id", member.household_id)
     .single();
 
-  if (!cat) redirect("/onboarding");
+  if (!log) notFound();
+
+  // only the recorder can edit
+  if (log.member_id !== member.id) redirect("/");
 
   return (
     <main className="flex min-h-screen flex-col items-center bg-zinc-50 px-4 py-8">
@@ -43,13 +42,11 @@ export default async function RecordPage() {
           <Link href="/" className="text-gray-400">
             ← 戻る
           </Link>
-          <h1 className="text-xl font-bold">給餌を記録</h1>
+          <h1 className="text-xl font-bold">記録を編集</h1>
         </div>
 
-        <form action={logFeeding} className="flex flex-col gap-8">
-          <input type="hidden" name="memberId" value={member.id} />
-          <input type="hidden" name="householdId" value={member.household_id} />
-          <input type="hidden" name="catId" value={cat.id} />
+        <form action={updateFeeding} className="flex flex-col gap-8">
+          <input type="hidden" name="id" value={log.id} />
 
           <div>
             <p className="mb-3 font-medium">フードの種類</p>
@@ -59,7 +56,7 @@ export default async function RecordPage() {
                   type="radio"
                   name="foodType"
                   value="dry"
-                  defaultChecked={defaultFoodType === "dry"}
+                  defaultChecked={log.food_type === "dry"}
                   className="peer sr-only"
                 />
                 <span className="flex items-center justify-center rounded-xl border-2 border-gray-200 py-4 font-medium transition-colors peer-checked:border-gray-900 peer-checked:bg-gray-900 peer-checked:text-white">
@@ -71,7 +68,7 @@ export default async function RecordPage() {
                   type="radio"
                   name="foodType"
                   value="wet"
-                  defaultChecked={defaultFoodType === "wet"}
+                  defaultChecked={log.food_type === "wet"}
                   className="peer sr-only"
                 />
                 <span className="flex items-center justify-center rounded-xl border-2 border-gray-200 py-4 font-medium transition-colors peer-checked:border-gray-900 peer-checked:bg-gray-900 peer-checked:text-white">
@@ -99,6 +96,7 @@ export default async function RecordPage() {
                     type="radio"
                     name="amount"
                     value={value}
+                    defaultChecked={log.amount === value}
                     className="peer sr-only"
                   />
                   <span className="flex items-center justify-center rounded-xl border-2 border-gray-200 py-3 font-medium transition-colors peer-checked:border-gray-900 peer-checked:bg-gray-900 peer-checked:text-white">
@@ -113,7 +111,7 @@ export default async function RecordPage() {
             type="submit"
             className="mt-4 w-full rounded-2xl bg-gray-900 py-5 text-xl font-bold text-white active:bg-gray-700"
           >
-            給餌した
+            保存
           </button>
         </form>
       </div>

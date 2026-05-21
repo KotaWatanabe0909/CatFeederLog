@@ -4,7 +4,7 @@ create table feeding_logs (
   cat_id        uuid references cats(id) on delete cascade not null,
   member_id     uuid references members(id) on delete cascade not null,
   food_type     text not null check (food_type in ('dry', 'wet')),
-  amount        text check (amount in ('finished', 'leftover')),
+  amount        text check (amount in ('all', 'most', 'half', 'little', 'none')),
   note          text,
   fed_at        timestamptz not null default now(),
   created_at    timestamptz not null default now()
