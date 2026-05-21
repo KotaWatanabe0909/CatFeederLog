@@ -28,15 +28,25 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   const pathname = request.nextUrl.pathname;
 
-  // 未ログイン → /login へ
-  if (!user && !pathname.startsWith("/login") && !pathname.startsWith("/auth")) {
+  // 未ログイン → /login へ（/invite/* は通す: ページ内でログイン後リダイレクト）
+  if (
+    !user &&
+    !pathname.startsWith("/login") &&
+    !pathname.startsWith("/auth") &&
+    !pathname.startsWith("/invite")
+  ) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
   }
 
-  // ログイン済みで世帯未所属 → /onboarding へ
-  if (user && !pathname.startsWith("/onboarding") && !pathname.startsWith("/auth")) {
+  // ログイン済みで世帯未所属 → /onboarding へ（/invite/* は通す: ページ内で参加処理）
+  if (
+    user &&
+    !pathname.startsWith("/onboarding") &&
+    !pathname.startsWith("/auth") &&
+    !pathname.startsWith("/invite")
+  ) {
     const { data: member } = await supabase
       .from("members")
       .select("id")
