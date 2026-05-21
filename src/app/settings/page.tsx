@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { QRSection } from "./QRSection";
+import { InviteSection } from "./InviteSection";
 
 export default function SettingsPage() {
   return (
@@ -12,12 +13,20 @@ export default function SettingsPage() {
           <h1 className="text-xl font-bold">設定</h1>
         </div>
 
-        <section>
+        <section className="mb-10">
           <h2 className="mb-2 font-semibold">QR コード</h2>
           <p className="mb-6 text-sm text-gray-500">
             このQRコードを餌場の近くに貼ってください。読み込むと給餌記録画面が開きます。
           </p>
           <QRSection />
+        </section>
+
+        <section>
+          <h2 className="mb-2 font-semibold">メンバーを招待</h2>
+          <p className="mb-6 text-sm text-gray-500">
+            リンクを共有すると、家族がこの世帯に参加できます。
+          </p>
+          <InviteSection />
         </section>
       </div>
     </main>

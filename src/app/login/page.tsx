@@ -1,16 +1,21 @@
 "use client";
 
 import { createClient } from "@/lib/supabase/client";
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
-export default function LoginPage() {
+function LoginForm() {
   const supabase = createClient();
+  const searchParams = useSearchParams();
+  const next = searchParams.get("next") ?? "";
 
   const handleGoogleLogin = async () => {
+    const callbackUrl = next
+      ? `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`
+      : `${window.location.origin}/auth/callback`;
     await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
+      options: { redirectTo: callbackUrl },
     });
   };
 
@@ -24,5 +29,13 @@ export default function LoginPage() {
         Google でログイン
       </button>
     </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   );
 }
