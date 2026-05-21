@@ -11,6 +11,8 @@ export async function GET(request: Request) {
   }
 
   const next = searchParams.get("next");
-  const destination = next ? `${origin}${next}` : `${origin}/`;
+  const destination = next?.startsWith("/") && !next.startsWith("//")
+    ? `${origin}${next}`
+    : `${origin}/`;
   return NextResponse.redirect(destination);
 }

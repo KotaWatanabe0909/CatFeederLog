@@ -15,14 +15,6 @@ export default async function InvitePage({
   } = await supabase.auth.getUser();
   if (!user) redirect(`/login?next=/invite/${token}`);
 
-  // already in a household
-  const { data: existing } = await supabase
-    .from("members")
-    .select("id")
-    .eq("user_id", user.id)
-    .single();
-  if (existing) redirect("/");
-
   // validate invite exists and is valid
   const { data: invite } = await supabase
     .from("invites")
@@ -37,7 +29,7 @@ export default async function InvitePage({
       <main className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 px-4">
         <div className="w-full max-w-md text-center">
           <p className="mb-2 text-lg font-semibold">招待リンクが無効です</p>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-900">
             リンクの有効期限が切れているか、すでに使用されています。
           </p>
         </div>
@@ -51,8 +43,8 @@ export default async function InvitePage({
     <main className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 px-4">
       <div className="w-full max-w-md text-center">
         <p className="mb-2 text-2xl font-bold">招待されています</p>
-        <p className="mb-8 text-gray-500">
-          このボタンを押すと世帯に参加します。
+        <p className="mb-8 text-gray-900">
+          このボタンを押すとグループに参加します。
         </p>
         <form action={joinAction}>
           <button

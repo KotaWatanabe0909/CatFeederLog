@@ -40,7 +40,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // ログイン済みで世帯未所属 → /onboarding へ（/invite/* は通す: ページ内で参加処理）
+  // ログイン済みでグループ未所属 → /onboarding へ（/invite/* は通す: ページ内で参加処理）
   if (
     user &&
     !pathname.startsWith("/onboarding") &&
@@ -51,7 +51,8 @@ export async function middleware(request: NextRequest) {
       .from("members")
       .select("id")
       .eq("user_id", user.id)
-      .single();
+      .limit(1)
+      .maybeSingle();
 
     if (!member) {
       const url = request.nextUrl.clone();
