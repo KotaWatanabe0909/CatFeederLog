@@ -3,8 +3,12 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { randomUUID } from "crypto";
+import { setActiveHousehold } from "@/lib/active-household";
 
-export async function createHousehold(formData: FormData) {
+export async function createHousehold(
+  _prev: { error?: string },
+  formData: FormData
+): Promise<{ error?: string }> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
@@ -15,23 +19,17 @@ export async function createHousehold(formData: FormData) {
 
   const householdId = randomUUID();
 
-  const { error: householdError } = await supabase
-    .from("households")
-    .insert({ id: householdId, name: householdName });
+  const { error } = await supabase.rpc("create_household", {
+    p_household_name: householdName,
+    p_display_name: displayName,
+    p_cat_name: catName,
+    p_household_id: householdId,
+    p_user_id: user.id,
+  });
 
-  if (householdError) throw new Error("世帯の作成に失敗しました");
+  if (error) return { error: `グループの作成に失敗しました: ${error.message}` };
 
-  const { error: memberError } = await supabase
-    .from("members")
-    .insert({ household_id: householdId, user_id: user.id, display_name: displayName, role: "owner" });
-
-  if (memberError) throw new Error("メンバーの作成に失敗しました");
-
-  const { error: catError } = await supabase
-    .from("cats")
-    .insert({ household_id: householdId, name: catName });
-
-  if (catError) throw new Error("猫の登録に失敗しました");
+  await setActiveHousehold(householdId);
 
   redirect("/");
 }

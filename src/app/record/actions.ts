@@ -31,7 +31,7 @@ export async function logFeeding(formData: FormData) {
     .single();
 
   const FOOD_LABEL: Record<string, string> = { dry: "ドライ", wet: "ウェット" };
-  const body = `${member?.display_name ?? "誰か"} が ${FOOD_LABEL[foodType] ?? foodType} をあげました`;
+  const body = `${member?.display_name ?? "誰か"} が ${FOOD_LABEL[foodType] ?? foodType} のご飯をあげました`;
 
   const { data: subscriptions } = await supabase
     .from("push_subscriptions")
@@ -49,7 +49,7 @@ export async function logFeeding(formData: FormData) {
       process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
       process.env.VAPID_PRIVATE_KEY!
     );
-    const payload = JSON.stringify({ title: "給餌記録", body });
+    const payload = JSON.stringify({ title: "ご飯の記録", body });
     await Promise.allSettled(
       subscriptions.map((sub) =>
         webpush.sendNotification(
@@ -60,5 +60,5 @@ export async function logFeeding(formData: FormData) {
     );
   }
 
-  redirect("/");
+  redirect(`/cats/${catId}`);
 }

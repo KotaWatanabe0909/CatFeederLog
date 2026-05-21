@@ -41,7 +41,7 @@ export function InviteSection() {
         </button>
       ) : (
         <div className="flex flex-col gap-3">
-          <p className="break-all rounded-xl bg-white p-3 text-sm text-gray-700 shadow-sm">
+          <p className="break-all rounded-xl bg-white p-3 text-sm text-gray-900 shadow-sm">
             {inviteUrl}
           </p>
           <button
@@ -52,14 +52,14 @@ export function InviteSection() {
           </button>
           <button
             onClick={() => { setInviteUrl(null); setCopied(false); }}
-            className="text-sm text-gray-400"
+            className="text-sm text-gray-900"
           >
             別のリンクを生成
           </button>
         </div>
       )}
       {error && <p className="mt-3 text-sm text-red-500">{error}</p>}
-      <p className="mt-3 text-xs text-gray-400">有効期限: 7日間</p>
+      <p className="mt-3 text-xs text-gray-900">有効期限: 7日間</p>
     </div>
   );
 }
